@@ -36,7 +36,7 @@
         <v-toolbar>
           <v-tabs v-model="tab">
             <v-tab value="ins"> Inscripciones </v-tab>
-            <v-tab value="mat"> Matriculas </v-tab>
+            <!-- <v-tab value="mat"> Matriculas </v-tab> -->
           </v-tabs>
         </v-toolbar>
         <v-container>
