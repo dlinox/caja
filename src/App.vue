@@ -4,12 +4,14 @@
       <div class="pa-2">
         <img src="@/assets/logo.png" width="50" alt="" />
       </div>
-      <v-toolbar-title>CAJA - UNA-PUNO</v-toolbar-title>
+      <v-toolbar-title>
+        <small>CAJA - UNA PUNO</small>
+      </v-toolbar-title>
 
       <v-chip label> Examen General 2023</v-chip>
       <v-spacer></v-spacer>
-      <v-btn>
-        <a :href="baseUrl" target="blank" class="text-white"> Ir a caja </a>
+      <v-btn >
+        <a :href="baseUrl" target="blank" class=" text-decoration-none text-white"> Ir a caja </a>
       </v-btn>
     </v-app-bar>
 
@@ -36,7 +38,7 @@
         <v-toolbar>
           <v-tabs v-model="tab">
             <v-tab value="ins"> Inscripciones </v-tab>
-            <!-- <v-tab value="mat"> Matriculas </v-tab> -->
+            <v-tab value="mat"> Matriculas </v-tab>
           </v-tabs>
         </v-toolbar>
         <v-container>
@@ -44,7 +46,7 @@
             <v-window-item value="ins">
               <SearchPostulant />
             </v-window-item>
-            <v-window-item value="mat">
+            <v-window-item value="mat" class="pa-0">  
               <FormMatricula />
             </v-window-item>
           </v-window>

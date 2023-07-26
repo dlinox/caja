@@ -15,7 +15,7 @@
           variant="outlined"
           :rules="rules"
           counter
-          :disabled="form.person"
+          :disabled="form.person ? true: false"
           maxlength="8"
           ref="inputSearch"
         />
@@ -359,6 +359,8 @@ const searchPostulant = async () => {
   }
   let res = await admitionService.searchPostulant(search.value);
 
+  
+
   if (res.ok) {
     if (res.status) {
       form.value.person = null;
@@ -376,7 +378,7 @@ const searchPostulant = async () => {
     } else {
       snakbar.value.show = true;
       snakbar.value.title = "Datos incorrectos";
-      snakbar.value.text = "Postulante no encontrado";
+      snakbar.value.text = res.message;
       snakbar.value.type = "red";
     }
   } else {

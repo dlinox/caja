@@ -4,9 +4,15 @@
     class="mx-auto mb-5 border"
     style="width: 500px"
   >
+    <v-toolbar class="bg-blue-darken-4">
+      <v-tabs v-model="typeMat">
+        <v-tab value="entrants"> Ingresantes </v-tab>
+        <v-tab value="regular" disabled> Regulares </v-tab>
+      </v-tabs>
+    </v-toolbar>
     <v-container>
       <v-form ref="formSearch" @submit.prevent="searchPostulant">
-        <div class="text-subtitle-1 mb-1">Buscar / Codifo de matricula</div>
+        <div class="text-subtitle-1 mb-1">Buscar / DNI</div>
         <v-text-field
           v-model="search"
           density="compact"
@@ -48,7 +54,7 @@
   </v-card>
 
   <v-row v-if="form.person">
-    <v-col cols="12" md="6">
+    <v-col cols="12" md="5">
       <v-card class="border">
         <v-card-title>Conceptos de pago </v-card-title>
         <v-divider></v-divider>
@@ -84,12 +90,12 @@
         </v-list-item>
       </v-card>
     </v-col>
-    <v-col cols="12" md="6">
+    <v-col cols="12" md="7">
       <v-card class="border">
         <v-card-title class="font-weight-bold">
           <small>
             {{
-              `${form.person.nro_doc} | ${form.person.nombres}  ${form.person.primer_apellido}  ${form.person.segundo_apellido}`
+              `${form.person.nro_documento} | ${form.person.nombres}  ${form.person.primer_apellido}  ${form.person.segundo_apellido}`
             }}
           </small>
         </v-card-title>
@@ -97,21 +103,44 @@
 
         <v-card-item>
           <v-list-item v-for="(item, index) in form.details" :key="index">
-            <v-list-item-title>
+            <v-list-item-title class="text-h5">
               {{ item.title }}
             </v-list-item-title>
-            <v-list-item-subtitle>
-              {{ "S/. " + item.price }}
-            </v-list-item-subtitle>
-            <template v-slot:append>
-              <v-chip class="ma-2" size="x-large" label>
+            <v-list-item-subtitle class="text-h6">
+              <v-chip class="ma-2 text-blue-darken-5" size="x-large" label>
                 <strong> {{ "S/. " + item.price }}</strong>
               </v-chip>
+            </v-list-item-subtitle>
+            <template v-slot:append>
+              <template v-if="item.hasPrint">
+                <v-btn
+                  block
+                  variant="flat"
+                  color="orange"
+                  @click="printPDF(item, index)"
+                >
+                  imprimir
+                </v-btn>
+              </template>
+              <template v-else>
+                <v-btn
+                  block
+                  variant="flat"
+                  color="success"
+                  @click="savePay(item, index)"
+                >
+                  Pagar
+                </v-btn>
+              </template>
+              <!-- <v-chip class="ma-2" size="x-large" label>
+                <strong> {{ "S/. " + item.price }}</strong>
+              </v-chip> -->
             </template>
+            <v-divider v-if="index === 0" class="mt-4"></v-divider>
           </v-list-item>
 
-          <v-divider></v-divider>
-          <v-list-item>
+          <!-- <v-divider></v-divider> -->
+          <!-- <v-list-item>
             <v-list-item-subtitle class="text-end me-4">
               <strong>Total a pagar</strong>
             </v-list-item-subtitle>
@@ -122,20 +151,22 @@
 
             <template v-slot:append>
               <v-chip
-                class="ma-2"
+                class="ma-2 text-h4"
                 size="x-large"
                 label
                 :class="detalleError !== null ? 'text-red' : ''"
               >
-                <strong :class="detalleError !== null ? 'text-red' : ''">
+                <strong
+                  :class="detalleError !== null ? 'text-red' : 'text-blue'"
+                >
                   {{ "S/. " + total }}</strong
                 >
               </v-chip>
             </template>
-          </v-list-item>
+          </v-list-item> -->
         </v-card-item>
         <v-divider></v-divider>
-        <v-card-actions class="">
+        <!-- <v-card-actions class="">
           <template v-if="hasPrint">
             <v-btn block variant="flat" color="orange" @click="printPDF">
               imprimir <small class="ms-3">[ ESPACIO + I]</small>
@@ -146,7 +177,7 @@
               Pagar <small class="ms-3">[ ESPACIO + P ]</small>
             </v-btn>
           </template>
-        </v-card-actions>
+        </v-card-actions> -->
       </v-card>
     </v-col>
   </v-row>
@@ -175,10 +206,12 @@ const payService = new PayService();
 
 const emit = defineEmits(["onSuccess"]);
 
+const typeMat = ref("entrants");
+
 const formSearch = ref(null);
 const inputSearch = ref(null);
 
-const search = ref(null);
+const search = ref("72735152");
 
 const rules = ref([
   (value) => {
@@ -200,55 +233,14 @@ const postulantLoading = ref(false);
 const conceptItems = ref([
   {
     value: "0075",
-    codeBN: 26,
-    title: "Derecho de Admisión",
-    price: 200.0,
-    options: [
-      {
-        title: "Colegio Estatal",
-        price: 200.0,
-      },
-      {
-        title: "Colegio Particular",
-        price: 350.0,
-      },
-      {
-        title: "Colegio Extranjero",
-        price: 450.0,
-      },
-    ],
+    title: "Matricula",
+    price: 75.0,
   },
   {
     value: "0219",
-    codeBN: 39,
-    title: "Servicio Medico",
-    price: 30.0,
+    title: "Carné Universitario",
+    price: 11.5,
   },
-  {
-    value: "0269",
-    codeBN: 25,
-    title: "Duplicado de constancia de inscripcion modificada",
-    price: 30.0,
-  },
-
-  // {
-  //   value: "0075",
-  //   title: "Derecho de Admisión - REZAGADOS",
-  //   price: 80.0,
-  // },
-
-  // {
-  //   value: "0269",
-  //   title: "Rezagados (para el cambio de postulacion de programa de estudio.)",
-  //   price: 100.0,
-  // },
-
-  // {
-  //   value: "0269",
-  //   title:
-  //     "Rezagados (al control de identificacion personal y recepcion de documentos, solo para postulantes aptos.)",
-  //   price: 100.0,
-  // },
 ]);
 
 const form = ref({
@@ -290,14 +282,15 @@ const restForm = () => {
 };
 
 const payPrint = ref(null);
+
 const hasPrint = ref(false);
 
 const urlBase = import.meta.env.VITE_APP_BASE_URL;
+
 const urlPrint = ref(null);
 
-const printPDF = () => {
-  urlPrint.value =
-    urlBase + "php/pdf_papeleta.php?id=" + payPrint.value.idpadre;
+const printPDF = (item) => {
+  urlPrint.value = urlBase + "php/pdf_papeleta.php?id=" + item.payPrint.idpadre;
 
   window.open(urlPrint.value);
 };
@@ -314,37 +307,7 @@ const validateDetails = async () => {
   }
 };
 
-// const fakePerson = {
-//   nro_doc: "73618178",
-//   primer_apellido: "Peres2",
-//   segundo_apellido: "Peres",
-//   nombres: "Juan",
-//   id_gestion: 1,
-//   pagos: [
-//     {
-//       cod: 26,
-//       monto: 200,
-//     },
-//   ],
-// };
-
 const searchPostulant = async () => {
-  //*fekeSearchPostulant
-  // form.value.person = null;
-  // form.value.details = [];
-  // form.value.person = fakePerson;
-
-  // fakePerson.pagos.forEach((item) => {
-  //   let pago = conceptItems.value.find(
-  //     (element) => item.cod === element.codeBN
-  //   );
-  //   if (pago) {
-  //     form.value.details.push(pago);
-  //   }
-  // });
-
-  // return;
-
   postulantLoading.value = true;
 
   const { valid } = await formSearch.value.validate();
@@ -356,7 +319,7 @@ const searchPostulant = async () => {
     postulantLoading.value = false;
     return;
   }
-  let res = await admitionService.searchPostulant(search.value);
+  let res = await admitionService.getEntrantsPayMat(search.value);
 
   if (res.ok) {
     if (res.status) {
@@ -364,13 +327,8 @@ const searchPostulant = async () => {
       form.value.details = [];
       form.value.person = res.data;
 
-      res.data.pagos.forEach((item) => {
-        let pago = conceptItems.value.find(
-          (element) => item.cod === element.codeBN
-        );
-        if (pago) {
-          form.value.details.push(pago);
-        }
+      conceptItems.value.forEach((item) => {
+        form.value.details.push(item);
       });
     } else {
       snakbar.value.show = true;
@@ -387,27 +345,36 @@ const searchPostulant = async () => {
   postulantLoading.value = false;
 };
 
-const savePay = async () => {
+const savePay = async (item, index) => {
   payPrint.value = null;
 
-  let validDetails = await validateDetails();
-  if (!validDetails) {
-    snakbar.value.show = true;
-    snakbar.value.title = "Error";
-    snakbar.value.text = "Seleccion al menos un concepto de pago";
-    snakbar.value.type = "red";
-    return;
-  }
+  //   let validDetails = await validateDetails();
+  //   if (!validDetails) {
+  //     snakbar.value.show = true;
+  //     snakbar.value.title = "Error";
+  //     snakbar.value.text = "Seleccion al menos un concepto de pago";
+  //     snakbar.value.type = "red";
+  //     return;
+  //   }
 
-  let res = await payService.savePay(form.value);
+  let data = {
+    details: [item],
+    person: form.value.person,
+  };
+
+  let res = await payService.savePayMat(data);
 
   if (res.success) {
     // form.value.person = res.data;
+
+    form.value.details[index].hasPrint = true;
+    form.value.details[index].payPrint = res.data;
+
     snakbar.value.show = true;
     snakbar.value.title = "Exito.";
     snakbar.value.text = res.message;
     snakbar.value.type = "green";
-    payPrint.value = res.data;
+    // payPrint.value = res.data;
     hasPrint.value = true;
   } else {
     snakbar.value.show = true;

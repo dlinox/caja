@@ -12,4 +12,16 @@ export default class PayService {
       return res.data;
     }
   };
+
+  savePayMat = async (data) => {
+    try {
+      let formData = new FormData();
+      formData.append("person", JSON.stringify(data.person));
+      formData.append("details", JSON.stringify(data.details));
+      let res = await server.post("papeletamatricula/", formData);
+      return res.data;
+    } catch (error) {
+      return res.data;
+    }
+  };
 }
