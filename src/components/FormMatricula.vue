@@ -53,8 +53,8 @@
     </v-container>
   </v-card>
 
-  <v-row v-if="form.person">
-    <v-col cols="12" md="5">
+  <v-row v-if="form.person" justify="center">
+    <!-- <v-col cols="12" md="5">
       <v-card class="border">
         <v-card-title>Conceptos de pago </v-card-title>
         <v-divider></v-divider>
@@ -89,7 +89,7 @@
           </template>
         </v-list-item>
       </v-card>
-    </v-col>
+    </v-col> -->
     <v-col cols="12" md="7">
       <v-card class="border">
         <v-card-title class="font-weight-bold">
