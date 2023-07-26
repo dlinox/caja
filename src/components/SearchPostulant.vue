@@ -15,6 +15,7 @@
           variant="outlined"
           :rules="rules"
           counter
+          :disabled="form.person"
           maxlength="8"
           ref="inputSearch"
         />
