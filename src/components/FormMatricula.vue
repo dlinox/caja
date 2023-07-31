@@ -11,7 +11,11 @@
       </v-tabs>
     </v-toolbar>
     <v-container>
+<<<<<<< HEAD
       <v-form ref="formSearch" @submit.prevent="searchPostulant">
+=======
+      <v-form ref="formSearch" @submit.prevent="searchIngresante">
+>>>>>>> 9304058633a81b8247d4762d5a6205506b02046e
         <div class="text-subtitle-1 mb-1">Buscar / DNI</div>
         <v-text-field
           v-model="search"
@@ -23,6 +27,7 @@
           counter
           maxlength="8"
           ref="inputSearch"
+          :disabled="form.person ? true : false"
         />
 
         <template v-if="form.person">
@@ -34,7 +39,7 @@
             :loading="postulantLoading"
             @click="restForm()"
           >
-            CANCELAR <small class="ms-2">[ESC]</small>
+            CANCELAR / TERMINATAR <small class="ms-2">[ESC]</small>
           </v-btn>
         </template>
 
@@ -53,6 +58,7 @@
     </v-container>
   </v-card>
 
+<<<<<<< HEAD
   <v-row v-if="form.person" justify="center">
     <!-- <v-col cols="12" md="5">
       <v-card class="border">
@@ -98,6 +104,15 @@
               `${form.person.nro_documento} | ${form.person.nombres}  ${form.person.primer_apellido}  ${form.person.segundo_apellido}`
             }}
           </small>
+=======
+  <v-row v-if="form.person">
+    <v-col cols="12" md="8" class="mx-auto">
+      <v-card class="border">
+        <v-card-title class="font-weight-bold">
+          {{
+            `${form.person.nro_documento} | ${form.person.nombres}  ${form.person.primer_apellido}  ${form.person.segundo_apellido}`
+          }}
+>>>>>>> 9304058633a81b8247d4762d5a6205506b02046e
         </v-card-title>
         <v-divider></v-divider>
 
@@ -108,6 +123,7 @@
             </v-list-item-title>
             <v-list-item-subtitle class="text-h6">
               <v-chip class="ma-2 text-blue-darken-5" size="x-large" label>
+<<<<<<< HEAD
                 <strong> {{ "S/. " + item.price }}</strong>
               </v-chip>
             </v-list-item-subtitle>
@@ -160,9 +176,39 @@
                   :class="detalleError !== null ? 'text-red' : 'text-blue'"
                 >
                   {{ "S/. " + total }}</strong
+=======
+                <strong>
+                  {{
+                    "S/. " + Number.parseFloat(item.price).toFixed(2)
+                  }}</strong
+>>>>>>> 9304058633a81b8247d4762d5a6205506b02046e
                 >
               </v-chip>
+            </v-list-item-subtitle>
+            <template v-slot:append>
+              <template v-if="item.hasPrint">
+                <v-btn
+                  block
+                  variant="flat"
+                  color="orange"
+                  @click="printPDF(item, index)"
+                >
+                  imprimir
+                </v-btn>
+              </template>
+              <template v-else>
+                <v-btn
+                  block
+                  variant="flat"
+                  color="success"
+                  :loading="item.loading"
+                  @click="savePay(item, index)"
+                >
+                  Pagar
+                </v-btn>
+              </template>
             </template>
+<<<<<<< HEAD
           </v-list-item> -->
         </v-card-item>
         <v-divider></v-divider>
@@ -178,6 +224,12 @@
             </v-btn>
           </template>
         </v-card-actions> -->
+=======
+            <v-divider v-if="index === 0" class="mt-4"></v-divider>
+          </v-list-item>
+        </v-card-item>
+        <v-divider></v-divider>
+>>>>>>> 9304058633a81b8247d4762d5a6205506b02046e
       </v-card>
     </v-col>
   </v-row>
@@ -195,7 +247,7 @@
   </v-snackbar>
 </template>
 <script setup>
-import { computed, ref, watch, watchEffect } from "vue";
+import { ref, watch } from "vue";
 import { AdmitionService, PayService } from "../services/";
 import { useMagicKeys } from "@vueuse/core";
 
@@ -232,28 +284,32 @@ const postulantLoading = ref(false);
 
 const conceptItems = ref([
   {
+<<<<<<< HEAD
     value: "0075",
+=======
+    value: "0091",
+>>>>>>> 9304058633a81b8247d4762d5a6205506b02046e
     title: "Matricula",
     price: 75.0,
   },
   {
+<<<<<<< HEAD
     value: "0219",
+=======
+    value: "0225",
+>>>>>>> 9304058633a81b8247d4762d5a6205506b02046e
     title: "Carné Universitario",
     price: 11.5,
   },
 ]);
 
+//tarifas carne : 0091, 0225
+
 const form = ref({
-  code: "",
+  // code: "",
   person: postulant.value,
   details: [],
 });
-
-const total = computed(() =>
-  form.value.details.reduce((total, item) => {
-    return total + item.price;
-  }, 0)
-);
 
 watch(escape, (val) => {
   if (val) {
@@ -261,36 +317,28 @@ watch(escape, (val) => {
   }
 });
 
-watchEffect(async () => {
-  if (space.value && p.value && form.value.person) {
-    await savePay();
-  }
-
-  if (space.value && i.value && hasPrint.value) {
-    printPDF();
-  }
-});
-
 const restForm = () => {
-  form.value.code = null;
   form.value.person = null;
   form.value.details = [];
-  payPrint.value = null;
-  hasPrint.value = false;
+
   search.value = null;
   inputSearch.value.focus();
 };
 
+<<<<<<< HEAD
 const payPrint = ref(null);
 
 const hasPrint = ref(false);
 
+=======
+>>>>>>> 9304058633a81b8247d4762d5a6205506b02046e
 const urlBase = import.meta.env.VITE_APP_BASE_URL;
 
 const urlPrint = ref(null);
 
 const printPDF = (item) => {
   urlPrint.value = urlBase + "php/pdf_papeleta.php?id=" + item.payPrint.idpadre;
+<<<<<<< HEAD
 
   window.open(urlPrint.value);
 };
@@ -308,6 +356,12 @@ const validateDetails = async () => {
 };
 
 const searchPostulant = async () => {
+=======
+  window.open(urlPrint.value);
+};
+
+const searchIngresante = async () => {
+>>>>>>> 9304058633a81b8247d4762d5a6205506b02046e
   postulantLoading.value = true;
 
   const { valid } = await formSearch.value.validate();
@@ -333,7 +387,7 @@ const searchPostulant = async () => {
     } else {
       snakbar.value.show = true;
       snakbar.value.title = "Datos incorrectos";
-      snakbar.value.text = "Postulante no encontrado";
+      snakbar.value.text = res.message;
       snakbar.value.type = "red";
     }
   } else {
@@ -346,6 +400,7 @@ const searchPostulant = async () => {
 };
 
 const savePay = async (item, index) => {
+<<<<<<< HEAD
   payPrint.value = null;
 
   //   let validDetails = await validateDetails();
@@ -367,6 +422,16 @@ const savePay = async (item, index) => {
   if (res.success) {
     // form.value.person = res.data;
 
+=======
+  let data = {
+    details: [item],
+    person: form.value.person,
+  };
+
+  let res = await payService.savePayMat(data);
+
+  if (res.success) {
+>>>>>>> 9304058633a81b8247d4762d5a6205506b02046e
     form.value.details[index].hasPrint = true;
     form.value.details[index].payPrint = res.data;
 

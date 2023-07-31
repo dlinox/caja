@@ -4,6 +4,11 @@
     class="mx-auto mb-5 border"
     style="width: 500px"
   >
+    <v-card-item>
+      <v-btn block variant="tonal" color="blue" @click="dialogPostulant = true">
+        Sin Pre-inscripcion
+      </v-btn>
+    </v-card-item>
     <v-container>
       <v-form ref="formSearch" @submit.prevent="searchPostulant">
         <div class="text-subtitle-1 mb-1">Buscar / Ingese el DNI</div>
@@ -15,7 +20,11 @@
           variant="outlined"
           :rules="rules"
           counter
+<<<<<<< HEAD
           :disabled="form.person ? true: false"
+=======
+          :disabled="form.person ? true : false"
+>>>>>>> 9304058633a81b8247d4762d5a6205506b02046e
           maxlength="8"
           ref="inputSearch"
         />
@@ -29,7 +38,7 @@
             :loading="postulantLoading"
             @click="restForm()"
           >
-            CANCELAR <small class="ms-2">[ESC]</small>
+            CANCELAR / TERMINAR <small class="ms-2">[ESC]</small>
           </v-btn>
         </template>
 
@@ -163,6 +172,63 @@
       <v-btn @click="snakbar.show = false"> x </v-btn>
     </template>
   </v-snackbar>
+
+  <v-dialog v-model="dialogPostulant" width="500px">
+    <v-card title="Registrar nueva persona">
+      <v-card-text>
+        <v-form ref="personFormRef">
+          <v-text-field
+            v-model="formPerson.nro_doc"
+            density="compact"
+            placeholder="DNI"
+            hide-details="auto"
+            variant="outlined"
+            :rules="rulesF"
+            counter
+            maxlength="8"
+            class="my-3"
+          />
+
+          <v-text-field
+            v-model="formPerson.nombres"
+            density="compact"
+            placeholder="Nombres"
+            hide-details="auto"
+            variant="outlined"
+            :rules="rulesF"
+            class="my-3"
+          />
+
+          <v-text-field
+            v-model="formPerson.primer_apellido"
+            density="compact"
+            placeholder="Apellido Paterno"
+            hide-details="auto"
+            variant="outlined"
+            :rules="rulesF"
+            class="my-3"
+          />
+
+          <v-text-field
+            v-model="formPerson.segundo_apellido"
+            density="compact"
+            placeholder="Apellido Materno"
+            hide-details="auto"
+            variant="outlined"
+            :rules="rulesF"
+            class="my-3"
+          />
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="red" @click="dialogPostulant = false"> cancelar </v-btn>
+        <v-spacer></v-spacer>
+        <v-btn color="blue-darken-4" variant="tonal" @click="savePerson">
+          Guardar
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 <script setup>
 import { computed, ref, watch, watchEffect } from "vue";
@@ -176,15 +242,30 @@ const payService = new PayService();
 
 const emit = defineEmits(["onSuccess"]);
 
+const formPerson = ref({
+  nro_doc: null,
+  primer_apellido: null,
+  segundo_apellido: null,
+  nombres: null,
+  pagos: [],
+});
+const dialogPostulant = ref(false);
+const personFormRef = ref(null);
+
 const formSearch = ref(null);
 const inputSearch = ref(null);
-
 const search = ref(null);
-
 const rules = ref([
   (value) => {
     if (value) return true;
     return "Ingrese el DNI.";
+  },
+]);
+
+const rulesF = ref([
+  (value) => {
+    if (value) return true;
+    return "Obligatorio.";
   },
 ]);
 
@@ -315,37 +396,26 @@ const validateDetails = async () => {
   }
 };
 
-// const fakePerson = {
-//   nro_doc: "73618178",
-//   primer_apellido: "Peres2",
-//   segundo_apellido: "Peres",
-//   nombres: "Juan",
-//   id_gestion: 1,
-//   pagos: [
-//     {
-//       cod: 26,
-//       monto: 200,
-//     },
-//   ],
-// };
+const savePerson = async () => {
+
+  const { valid } = await personFormRef.value.validate();
+
+  if (!valid) {
+    snakbar.value.show = true;
+    snakbar.value.title = "Error";
+    snakbar.value.text = "Todos los campos son obligatorios";
+    snakbar.value.type = "red";
+
+    return;
+  }
+  form.value.person = null;
+  form.value.person = formPerson.value;
+  form.value.details = [];
+
+  dialogPostulant.value = false;
+};
 
 const searchPostulant = async () => {
-  //*fekeSearchPostulant
-  // form.value.person = null;
-  // form.value.details = [];
-  // form.value.person = fakePerson;
-
-  // fakePerson.pagos.forEach((item) => {
-  //   let pago = conceptItems.value.find(
-  //     (element) => item.cod === element.codeBN
-  //   );
-  //   if (pago) {
-  //     form.value.details.push(pago);
-  //   }
-  // });
-
-  // return;
-
   postulantLoading.value = true;
 
   const { valid } = await formSearch.value.validate();
@@ -372,6 +442,7 @@ const searchPostulant = async () => {
           (element) => item.cod === element.codeBN
         );
         if (pago) {
+          console.log(pago.price);
           form.value.details.push(pago);
         }
       });
